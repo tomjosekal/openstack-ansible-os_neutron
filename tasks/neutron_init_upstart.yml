@@ -16,13 +16,11 @@
 - name: Place the init script
   template:
     src: "neutron-upstart-init.j2"
-    dest: "/etc/init/{{ program_name }}.conf"
+    dest: "/etc/init/{{ item.value.service_name }}.conf"
     mode: "0644"
     owner: "root"
     group: "root"
-  register: upstart_init
-
-- name: Reload init scripts
-  shell: |
-    initctl reload-configuration
-  when: upstart_init | changed
+  with_dict: "{{ neutron_services }}"
+  when: inventory_hostname in groups[item.value.group]
+  notify:
+    - Reload upstart init scripts

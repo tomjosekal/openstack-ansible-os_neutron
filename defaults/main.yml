@@ -170,6 +170,7 @@ neutron_plugins:
     plugin_ini: plugins/nuage/nuage.ini
     plugin_conf_ini_overrides: "{{ neutron_nuage_conf_ini_overrides }}"
 
+## Service Name-Group Mapping
 neutron_services:
  neutron-dhcp-agent:
    group: neutron_dhcp_agent

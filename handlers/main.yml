@@ -13,6 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Reload systemd daemon
+  command: "systemctl daemon-reload"
+  notify:
+    - Restart neutron services
+
+- name: Reload upstart init scripts
+  shell: |
+    initctl reload-configuration
+  notify:
+    - Restart neutron services
+    
 - name: Restart neutron services
   service:
     name: "{{ item.value.service_name }}"
@@ -22,7 +33,9 @@
   failed_when: false
   notify:
     - Run ns-metadata-proxy process cleanup
-  when: item.value.service_en | bool
+  when: 
+    - inventory_hostname in groups[item.value.group]
+    - "{{ item.value.condition | default(true) }}"
 
 # NOTE(cloudnull):
 # When installing or upgrading it is possible that an old metadata proxy process will not
